@@ -36,11 +36,34 @@ class Chessman(pygame.sprite.Sprite):
     def col(self, col):
         self._col = col
         self.rect.left = col * GRID
+
+    @property
+    def left(self):
+        return chessboard[self.row][self.col - 1]
+
+    @property
+    def right(self):
+        return chessboard[self.row][self.col + 1]
     
+    @property
+    def up(self):
+        return chessboard[self.row - 1][self.col]
+    
+    @property
+    def down(self):
+        return chessboard[self.row + 1][self.col]
+
     def __repr__(self):
         return self.color + self.name
     
-    __str__ = __repr__
+    def __str__(self):
+        return f'{self.color}{self.name} {self.col, self.row}'
+
+    def get_moves(self):
+        # 获取可能的移动
+        # 返回：坐标 [(row, col), ...]
+        res = []
+        return res
 
 def place_chess(mode=True):
     # 生成棋子 Chessman 对象
@@ -64,27 +87,19 @@ def place_chess(mode=True):
     bp = 0
     for chessman in templist:
         # 白
+        if mode:
+            chessman.row = 7
+        else:
+            chessman.row = 0
         if chessman.color == 'w':
             if chessman.name == 'k':
                 # 王
                 chessman.col = 4
-                if mode:
-                    chessman.row = 7
-                else:
-                    chessman.row = 0
             elif chessman.name == 'q':
                 # 后
                 chessman.col = 3
-                if mode:
-                    chessman.row = 7
-                else:
-                    chessman.row = 0
             elif chessman.name == 'r':
                 # 车
-                if mode:
-                    chessman.row = 7
-                else:
-                    chessman.row = 0
                 if wr:
                     chessman.col = 7
                 else:
@@ -92,10 +107,6 @@ def place_chess(mode=True):
                     wr = True
             elif chessman.name == 'b':
                 # 象
-                if mode:
-                    chessman.row = 7
-                else:
-                    chessman.row = 0
                 if wb:
                     chessman.col = 5
                 else:
@@ -103,10 +114,6 @@ def place_chess(mode=True):
                     wb = True
             elif chessman.name == 'n':
                 # 马
-                if mode:
-                    chessman.row = 7
-                else:
-                    chessman.row = 0
                 if wn:
                     chessman.col = 6
                 else:
@@ -122,37 +129,25 @@ def place_chess(mode=True):
                 wp += 1
         # 黑
         elif chessman.color == 'b':
+            if mode:
+                chessman.row = 0
+            else:
+                chessman.row = 7
             if chessman.name == 'k':
                 # 王
                 chessman.col = 4
-                if mode:
-                    chessman.row = 0
-                else:
-                    chessman.row = 7
             elif chessman.name == 'q':
                 # 后
                 chessman.col = 3
-                if mode:
-                    chessman.row = 0
-                else:
-                    chessman.row = 7
             elif chessman.name == 'r':
                 # 车
-                if mode:
-                    chessman.row = 0
-                else:
-                    chessman.row = 7
                 if br:
                     chessman.col = 7
                 else:
                     chessman.col = 0
                     br = True
             elif chessman.name == 'b':
-                # 白象
-                if mode:
-                    chessman.row = 0
-                else:
-                    chessman.row = 7
+                # 象
                 if bb:
                     chessman.col = 5
                 else:
@@ -160,10 +155,6 @@ def place_chess(mode=True):
                     bb = True
             elif chessman.name == 'n':
                 # 马
-                if mode:
-                    chessman.row = 0
-                else:
-                    chessman.row = 7
                 if wn:
                     chessman.col = 6
                 else:
@@ -177,8 +168,7 @@ def place_chess(mode=True):
                     chessman.row = 6
                 chessman.col = bp
                 bp += 1
-        if chessman.row > -1 and chessman.col > -1:
-            chessboard[chessman.row][chessman.col] = chessman
+        chessboard[chessman.row][chessman.col] = chessman
 
 def print_chessboard():
     # 调试用的函数，用于输出 chessboard
@@ -200,4 +190,3 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 pygame.quit()
-
