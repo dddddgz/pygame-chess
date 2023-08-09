@@ -54,46 +54,145 @@ def place_chess(mode=True):
         for name in 'kqrrbbnnpppppppp':
             chessman = Chessman(color, name)
             templist.append(chessman)
-    # 车 后 象 兵
-    wr, wn, wb, wp = False, False, False, False
+    # 车 后 象（白）
+    wr = wn = wb = False
+    # 车 后 象（黑）
+    br = bn = bb = False
+    # 白兵出现的次数
+    wp = 0
+    # 黑兵出现的次数
+    bp = 0
     for chessman in templist:
+        # 白
         if chessman.color == 'w':
             if chessman.name == 'k':
-                # 白王
+                # 王
                 chessman.col = 4
                 if mode:
                     chessman.row = 7
                 else:
                     chessman.row = 0
             elif chessman.name == 'q':
-                # 白后
+                # 后
                 chessman.col = 3
                 if mode:
                     chessman.row = 7
                 else:
                     chessman.row = 0
             elif chessman.name == 'r':
-                # 白车
-                if wr:
-                    if mode:
-                        chessman.row = 7
-                        chessman.col = 7
-                    else:
-                        chessman.row = 0
-                        chessman.col = 7
+                # 车
+                if mode:
+                    chessman.row = 7
                 else:
-                    if mode:
-                        chessman.row = 7
-                        chessman.col = 0
-                    else:
-                        chessman.row = 0
-                        chessman.col = 0
-        chessboard[chessman.row][chessman.col] = chessman
+                    chessman.row = 0
+                if wr:
+                    chessman.col = 7
+                else:
+                    chessman.col = 0
+                    wr = True
+            elif chessman.name == 'b':
+                # 象
+                if mode:
+                    chessman.row = 7
+                else:
+                    chessman.row = 0
+                if wb:
+                    chessman.col = 5
+                else:
+                    chessman.col = 2
+                    wb = True
+            elif chessman.name == 'n':
+                # 马
+                if mode:
+                    chessman.row = 7
+                else:
+                    chessman.row = 0
+                if wn:
+                    chessman.col = 6
+                else:
+                    chessman.col = 1
+                    wn = True
+            elif chessman.name == 'p':
+                # 兵
+                if mode:
+                    chessman.row = 6
+                else:
+                    chessman.row = 1
+                chessman.col = wp
+                wp += 1
+        # 黑
+        elif chessman.color == 'b':
+            if chessman.name == 'k':
+                # 王
+                chessman.col = 4
+                if mode:
+                    chessman.row = 0
+                else:
+                    chessman.row = 7
+            elif chessman.name == 'q':
+                # 后
+                chessman.col = 3
+                if mode:
+                    chessman.row = 0
+                else:
+                    chessman.row = 7
+            elif chessman.name == 'r':
+                # 车
+                if mode:
+                    chessman.row = 0
+                else:
+                    chessman.row = 7
+                if br:
+                    chessman.col = 7
+                else:
+                    chessman.col = 0
+                    br = True
+            elif chessman.name == 'b':
+                # 白象
+                if mode:
+                    chessman.row = 0
+                else:
+                    chessman.row = 7
+                if bb:
+                    chessman.col = 5
+                else:
+                    chessman.col = 2
+                    bb = True
+            elif chessman.name == 'n':
+                # 马
+                if mode:
+                    chessman.row = 0
+                else:
+                    chessman.row = 7
+                if wn:
+                    chessman.col = 6
+                else:
+                    chessman.col = 1
+                    wn = True
+            elif chessman.name == 'p':
+                # 白兵
+                if mode:
+                    chessman.row = 1
+                else:
+                    chessman.row = 6
+                chessman.col = bp
+                bp += 1
+        if chessman.row > -1 and chessman.col > -1:
+            chessboard[chessman.row][chessman.col] = chessman
+
+def print_chessboard():
+    # 调试用的函数，用于输出 chessboard
+    for row in chessboard:
+        print('[', end='')
+        for chessman in row:
+            print(repr(chessman).center(4), end=', ')
+        print(']')
 
 screen = pygame.display.set_mode((WINDOW, WINDOW))
 chessboard = []
 
 place_chess()
+print_chessboard()
 
 running = True
 while running:
