@@ -39,19 +39,23 @@ class Chessman(pygame.sprite.Sprite):
 
     @property
     def left(self):
-        return chessboard[self.row][self.col - 1]
+        if self.col > 0:
+            return chessboard[self.row][self.col - 1]
 
     @property
     def right(self):
-        return chessboard[self.row][self.col + 1]
+        if self.col < 7:
+            return chessboard[self.row][self.col + 1]
     
     @property
     def up(self):
-        return chessboard[self.row - 1][self.col]
+        if self.row > 0:
+            return chessboard[self.row - 1][self.col]
     
     @property
     def down(self):
-        return chessboard[self.row + 1][self.col]
+        if self.row < 7:
+            return chessboard[self.row + 1][self.col]
 
     def __repr__(self):
         return self.color + self.name
