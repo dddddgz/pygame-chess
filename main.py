@@ -36,36 +36,64 @@ class Chessman(pygame.sprite.Sprite):
     def col(self, col):
         self._col = col
         self.rect.left = col * GRID
+    
+    def __repr__(self):
+        return self.color + self.name
+    
+    __str__ = __repr__
 
-def place_chess(mode):
+def place_chess(mode=True):
     # 生成棋子 Chessman 对象
     # mode: True白棋在下面 / False黑棋在下面
+    # 重置棋盘
     chessboard.clear()
+    for _ in range(8):
+        chessboard.append([None for _ in range(8)])
     templist = []
     for color in 'bw':
         for name in 'kqrrbbnnpppppppp':
             chessman = Chessman(color, name)
             templist.append(chessman)
-    wr, wn, wb = False, False, False
+    # 车 后 象 兵
+    wr, wn, wb, wp = False, False, False, False
     for chessman in templist:
         if chessman.color == 'w':
             if chessman.name == 'k':
+                # 白王
                 chessman.col = 4
                 if mode:
                     chessman.row = 7
                 else:
                     chessman.row = 0
             elif chessman.name == 'q':
+                # 白后
                 chessman.col = 3
                 if mode:
                     chessman.row = 7
                 else:
                     chessman.row = 0
             elif chessman.name == 'r':
-                pass
-                
+                # 白车
+                if wr:
+                    if mode:
+                        chessman.row = 7
+                        chessman.col = 7
+                    else:
+                        chessman.row = 0
+                        chessman.col = 7
+                else:
+                    if mode:
+                        chessman.row = 7
+                        chessman.col = 0
+                    else:
+                        chessman.row = 0
+                        chessman.col = 0
+        chessboard[chessman.row][chessman.col] = chessman
+
 screen = pygame.display.set_mode((WINDOW, WINDOW))
 chessboard = []
+
+place_chess()
 
 running = True
 while running:
