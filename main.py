@@ -1,7 +1,7 @@
 import pygame
 pygame.init()
 
-WINDOW = 640
+WINDOW = 400
 # 一个棋盘中有8行8列
 GRID = WINDOW // 8
 
@@ -76,23 +76,23 @@ class Chessman(pygame.sprite.Sprite):
                 # 兵
                 if mode:
                     if self.up() is None:
-                        res.append(self.up())
+                        res.append((self.col, self.row - 1))
                         if self.row == 6 and self.up(2) is None:
-                            res.append(self.up(2))
+                            res.append((self.col, self.row - 2))
                     if self.left() and self.left().up() and self.left().color == 'b':
-                        res.append(self.left().up())
+                        res.append((self.col - 1, self.row - 1))
                     if self.right() and self.right().up() and self.right().color == 'b':
-                        res.append(self.right().up())
+                        res.append(self.col - 1, self.row - 1)
                 else:
                     if self.down() is None:
-                        res.append(self.down())
+                        res.append((self.col, self.row + 1))
                         if self.row == 1 and self.down(2) is None:
-                            res.append(self.down(2))
+                            res.append((self.col, self.row + 2))
                     if self.left() and self.left().down() and self.left().color == 'b':
-                        res.append(self.left().up())
+                        res.append((self.col - 1, self.row + 1))
                     if self.right() and self.right().down() and self.right().color == 'b':
-                        res.append(self.right().up())
-                    return res
+                        res.append((self.col + 1, self. row + 1))
+        return res
 
 # mode: True白棋在下面 / False黑棋在下面
 mode = True
@@ -186,11 +186,11 @@ def place_chess():
                     bb = True
             elif chessman.name == 'n':
                 # 马
-                if wn:
+                if bn:
                     chessman.col = 6
                 else:
                     chessman.col = 1
-                    wn = True
+                    bn = True
             elif chessman.name == 'p':
                 # 白兵
                 if mode:
@@ -210,6 +210,7 @@ def print_chessboard():
         print(']')
 
 screen = pygame.display.set_mode((WINDOW, WINDOW))
+bg = pygame.image.load('images/bg.png')
 chessboard = []
 
 place_chess()
@@ -217,6 +218,11 @@ print_chessboard()
 
 running = True
 while running:
+    screen.blit(bg, (0, 0))
+    for row in chessboard:
+        for chessman in row:
+            chessman and screen.blit(chessman.image, chessman.rect)
+    pygame.display.flip()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
