@@ -214,16 +214,17 @@ bg = pygame.image.load('images/bg.png')
 chessboard = []
 
 place_chess()
-print_chessboard()
 
+clock = pygame.time.Clock()
 running = True
 while running:
+    clock.tick(30)
     screen.blit(bg, (0, 0))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
     for row in chessboard:
         for chessman in row:
             chessman and screen.blit(chessman.image, chessman.rect)
     pygame.display.flip()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
 pygame.quit()
