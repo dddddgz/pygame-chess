@@ -12,7 +12,10 @@ class Chessman(pygame.sprite.Sprite):
         # row for y, col for x
         self.color = color
         self.name = name
-        self.image = pygame.image.load('images/' + color + name + '.png')
+        self.image = pygame.image.load(f'images/{color}{name}.png')
+        self.back = pygame.Surface((GRID, GRID)).convert_alpha()
+        self.back.fill((0, 0, 0, 0))
+        pygame.draw.circle(self.back, 'BurlyWood', self.back.get_rect().center, GRID / 2)
         self.rect = self.image.get_rect()
         # 不显示棋子
         self.rect.topleft = (-GRID, -GRID)
@@ -215,6 +218,7 @@ chessboard = []
 
 place_chess()
 
+chosen = None
 clock = pygame.time.Clock()
 running = True
 while running:
@@ -223,8 +227,19 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            for row in chessboard:
+                for chessman in row:
+                    if chessman and chessman.rect.collidepoint(event.pos):
+                        chosen = chessman
+                        break
     for row in chessboard:
         for chessman in row:
-            chessman and screen.blit(chessman.image, chessman.rect)
+            if chessman:
+                if chessman is chosen:
+                    screen.blit(chessman.back, chessman.rect)
+                    for pos in chessman.get_moves():
+                        screen.blit(chessman.back, (pos[0] * GRID, pos[1] * GRID))
+                screen.blit(chessman.image, chessman.rect)
     pygame.display.flip()
 pygame.quit()
