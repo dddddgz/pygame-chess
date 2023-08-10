@@ -37,25 +37,25 @@ class Chessman(pygame.sprite.Sprite):
         self._col = col
         self.rect.left = col * GRID
 
-    @property
-    def left(self):
+    def left(self, n=1):
         if self.col > 0:
-            return chessboard[self.row][self.col - 1]
-
-    @property
-    def right(self):
+            return chessboard[self.row][self.col - n]
+        return ''
+    
+    def right(self, n=1):
         if self.col < 7:
-            return chessboard[self.row][self.col + 1]
+            return chessboard[self.row][self.col + n]
+        return ''
     
-    @property
-    def up(self):
+    def up(self, n=1):
         if self.row > 0:
-            return chessboard[self.row - 1][self.col]
+            return chessboard[self.row - n][self.col]
+        return ''
     
-    @property
-    def down(self):
+    def down(self, n=1):
         if self.row < 7:
-            return chessboard[self.row + 1][self.col]
+            return chessboard[self.row + n][self.col]
+        return ''
 
     def __repr__(self):
         return self.color + self.name
@@ -67,11 +67,38 @@ class Chessman(pygame.sprite.Sprite):
         # 获取可能的移动
         # 返回：坐标 [(row, col), ...]
         res = []
-        return res
+        if self.color == 'w':
+            # 白
+            if self.name == 'k':
+                # 王
+                pass
+            elif self.name == 'p':
+                # 兵
+                if mode:
+                    if self.up() is None:
+                        res.append(self.up())
+                        if self.row == 6 and self.up(2) is None:
+                            res.append(self.up(2))
+                    if self.left() and self.left().up() and self.left().color == 'b':
+                        res.append(self.left().up())
+                    if self.right() and self.right().up() and self.right().color == 'b':
+                        res.append(self.right().up())
+                else:
+                    if self.down() is None:
+                        res.append(self.down())
+                        if self.row == 1 and self.down(2) is None:
+                            res.append(self.down(2))
+                    if self.left() and self.left().down() and self.left().color == 'b':
+                        res.append(self.left().up())
+                    if self.right() and self.right().down() and self.right().color == 'b':
+                        res.append(self.right().up())
+                    return res
 
-def place_chess(mode=True):
+# mode: True白棋在下面 / False黑棋在下面
+mode = True
+
+def place_chess():
     # 生成棋子 Chessman 对象
-    # mode: True白棋在下面 / False黑棋在下面
     # 重置棋盘
     chessboard.clear()
     for _ in range(8):
@@ -90,12 +117,12 @@ def place_chess(mode=True):
     # 黑兵出现的次数
     bp = 0
     for chessman in templist:
-        # 白
         if mode:
             chessman.row = 7
         else:
             chessman.row = 0
         if chessman.color == 'w':
+            # 白
             if chessman.name == 'k':
                 # 王
                 chessman.col = 4
@@ -131,8 +158,8 @@ def place_chess(mode=True):
                     chessman.row = 1
                 chessman.col = wp
                 wp += 1
-        # 黑
         elif chessman.color == 'b':
+            # 黑
             if mode:
                 chessman.row = 0
             else:
