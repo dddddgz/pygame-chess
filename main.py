@@ -9,7 +9,6 @@ class Chessman(pygame.sprite.Sprite):
     def __init__(self, color, name):
         # color: b黑色 / w白色
         # name: k王 / q后 / r车 / b象 / n马 / p兵
-        # row for y, col for x
         self.color = color
         self.name = name
         self.image = pygame.image.load(f'images/{color}{name}.png')
@@ -19,34 +18,26 @@ class Chessman(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         # 不显示棋子
         self.rect.topleft = (-GRID, -GRID)
-        self._row = -1
-        self._col = -1
+        self.row = -1
+        self.col = -1
 
-    @property
-    def row(self):
-        return self._row
-    
-    @row.setter
-    def row(self, row):
-        old = self._row
-        self._row = row
-        self.rect.top = row * GRID
-        if old != -1 and self._col != -1:
-            chessboard[old][self._col] = None
-            chessboard[row][self._col] = self
-
-    @property
-    def col(self):
-        return self._col
-
-    @col.setter
-    def col(self, col):
-        old = self._col
-        self._col = col
-        self.rect.left = col * GRID
-        if self._row != -1 and old != -1:
-            chessboard[self._row][old] = None
-            chessboard[self._row][col] = self
+    def move(self, row=None, col=None):
+        # 设置棋子的位置
+        # row: 行
+        # col: 列
+        old_row = self.row
+        old_col = self.col
+        if row is None:
+            row = old_row
+        if col is None:
+            col = old_col
+        self.row = row
+        self.col = col
+        self.rect.topleft = col * GRID, row * GRID
+        if old_row != -1 and old_col != -1:
+            chessboard[old_row][old_col] = None
+        if self.row != -1 and self.col != -1:
+            chessboard[self.row][self.col] = self
 
     def left(self, n=1):
         if self.col > 0:
@@ -125,90 +116,88 @@ def place_chess():
     bp = 0
     for chessman in templist:
         if mode:
-            chessman.row = 7
+            chessman.move(row=7)
         else:
-            chessman.row = 0
+            chessman.move(row=0)
         if chessman.color == 'w':
             # 白
             if chessman.name == 'k':
                 # 王
-                chessman.col = 4
+                chessman.move(col=4)
             elif chessman.name == 'q':
                 # 后
-                chessman.col = 3
+                chessman.move(col=3)
             elif chessman.name == 'r':
                 # 车
                 if wr:
-                    chessman.col = 7
+                    chessman.move(col=7)
                 else:
-                    chessman.col = 0
+                    chessman.move(col=0)
                     wr = True
             elif chessman.name == 'b':
                 # 象
                 if wb:
-                    chessman.col = 5
+                    chessman.move(col=5)
                 else:
-                    chessman.col = 2
+                    chessman.move(col=2)
                     wb = True
             elif chessman.name == 'n':
                 # 马
                 if wn:
-                    chessman.col = 6
+                    chessman.move(col=6)
                 else:
-                    chessman.col = 1
+                    chessman.move(col=1)
                     wn = True
             elif chessman.name == 'p':
                 # 兵
                 if mode:
-                    chessman.row = 6
+                    chessman.move(row=6)
                 else:
-                    chessman.row = 1
-                chessman.col = wp
+                    chessman.move(row=1)
+                chessman.move(col=wp)
                 wp += 1
         elif chessman.color == 'b':
             # 黑
             if mode:
-                chessman.row = 0
+                chessman.move(row=0)
             else:
-                chessman.row = 7
+                chessman.move(row=7)
             if chessman.name == 'k':
                 # 王
-                chessman.col = 4
+                chessman.move(col=4)
             elif chessman.name == 'q':
                 # 后
-                chessman.col = 3
+                chessman.move(col=3)
             elif chessman.name == 'r':
                 # 车
                 if br:
-                    chessman.col = 7
+                    chessman.move(col=7)
                 else:
-                    chessman.col = 0
+                    chessman.move(col=0)
                     br = True
             elif chessman.name == 'b':
                 # 象
                 if bb:
-                    chessman.col = 5
+                    chessman.move(col=5)
                 else:
-                    chessman.col = 2
+                    chessman.move(col=2)
                     bb = True
             elif chessman.name == 'n':
                 # 马
                 if bn:
-                    chessman.col = 6
+                    chessman.move(col=6)
                 else:
-                    chessman.col = 1
+                    chessman.move(col=1)
                     bn = True
             elif chessman.name == 'p':
                 # 白兵
                 if mode:
-                    chessman.row = 1
+                    chessman.move(row=1)
                 else:
-                    chessman.row = 6
-                chessman.col = bp
+                    chessman.move(row=6)
+                chessman.move(col=bp)
                 bp += 1
         chessboard[chessman.row][chessman.col] = chessman
-        print_chessboard()
-        print()
 
 def print_chessboard():
     # 调试用的函数，用于输出 chessboard
@@ -226,10 +215,10 @@ pygame.display.set_icon(bg)
 chessboard = []
 place_chess()
 print_chessboard()
-# chessboard[1][1].row = 6
 
 chosen = None
 clock = pygame.time.Clock()
+down = False
 running = True
 while running:
     clock.tick(30)
