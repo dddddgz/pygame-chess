@@ -28,8 +28,12 @@ class Chessman(pygame.sprite.Sprite):
     
     @row.setter
     def row(self, row):
+        old = self._row
         self._row = row
         self.rect.top = row * GRID
+        if old != -1 and self._col != -1:
+            chessboard[old][self._col] = None
+            chessboard[row][self._col] = self
 
     @property
     def col(self):
@@ -37,28 +41,28 @@ class Chessman(pygame.sprite.Sprite):
 
     @col.setter
     def col(self, col):
+        old = self._col
         self._col = col
         self.rect.left = col * GRID
+        if self._row != -1 and old != -1:
+            chessboard[self._row][old] = None
+            chessboard[self._row][col] = self
 
     def left(self, n=1):
         if self.col > 0:
             return chessboard[self.row][self.col - n]
-        return ''
     
     def right(self, n=1):
         if self.col < 7:
             return chessboard[self.row][self.col + n]
-        return ''
     
     def up(self, n=1):
         if self.row > 0:
             return chessboard[self.row - n][self.col]
-        return ''
     
     def down(self, n=1):
         if self.row < 7:
             return chessboard[self.row + n][self.col]
-        return ''
 
     def __repr__(self):
         return self.color + self.name
@@ -203,20 +207,26 @@ def place_chess():
                 chessman.col = bp
                 bp += 1
         chessboard[chessman.row][chessman.col] = chessman
+        print_chessboard()
+        print()
 
 def print_chessboard():
     # 调试用的函数，用于输出 chessboard
     for row in chessboard:
         print('[', end='')
         for chessman in row:
-            print(repr(chessman).center(4), end=', ')
+            # print(repr(chessman).center(4), end=', ')
+            print(str(id(chessman))[-4:], end=', ')
         print(']')
 
 screen = pygame.display.set_mode((WINDOW, WINDOW))
 bg = pygame.image.load('images/bg.png')
+pygame.display.set_caption('二向箔 Chess')
+pygame.display.set_icon(bg)
 chessboard = []
-
 place_chess()
+print_chessboard()
+# chessboard[1][1].row = 6
 
 chosen = None
 clock = pygame.time.Clock()
