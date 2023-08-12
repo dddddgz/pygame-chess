@@ -1,4 +1,5 @@
 import pygame
+from pprint import pprint
 pygame.init()
 
 WINDOW = 400
@@ -20,6 +21,7 @@ class Chessman(pygame.sprite.Sprite):
         self.rect.topleft = (-GRID, -GRID)
         self.row = -1
         self.col = -1
+        self.moved = False
 
     def move(self, row=None, col=None):
         # 设置棋子的位置
@@ -201,12 +203,14 @@ def place_chess():
 
 def print_chessboard():
     # 调试用的函数，用于输出 chessboard
-    for row in chessboard:
-        print('[', end='')
-        for chessman in row:
-            # print(repr(chessman).center(4), end=', ')
-            print(str(id(chessman))[-4:], end=', ')
-        print(']')
+    pprint(chessboard)
+
+def pos_to_grid(pos):
+    # 将 (x, y) 转换为 (row, col)
+    # pos: 坐标 (x, y)
+    x, y = pos
+    row, col = y // GRID, x // GRID
+    return row, col
 
 screen = pygame.display.set_mode((WINDOW, WINDOW))
 bg = pygame.image.load('images/bg.png')
@@ -214,7 +218,6 @@ pygame.display.set_caption('二向箔 Chess')
 pygame.display.set_icon(bg)
 chessboard = []
 place_chess()
-print_chessboard()
 
 chosen = None
 clock = pygame.time.Clock()
@@ -227,11 +230,28 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            down = True
+            # 是否找到点击的棋子
+            found = False
             for row in chessboard:
                 for chessman in row:
                     if chessman and chessman.rect.collidepoint(event.pos):
                         chosen = chessman
+                        found = True
                         break
+            if not found:
+                chosen = None
+        elif event.type == pygame.MOUSEBUTTONUP:
+            down = False
+            row, col = pos_to_grid(event.pos)
+            print(chosen.get_moves(), (row, col))
+            if chosen and (row, col) in chosen.get_moves():
+                chosen.rect.topleft = (col * GRID, row * GRID)
+            else:
+                chosen.move()
+        elif event.type == pygame.MOUSEMOTION:
+            if chosen and down:
+                chosen.rect.center = event.pos
     for row in chessboard:
         for chessman in row:
             if chessman:
