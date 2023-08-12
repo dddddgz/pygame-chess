@@ -21,7 +21,11 @@ class Chessman(pygame.sprite.Sprite):
         self.rect.topleft = (-GRID, -GRID)
         self.row = -1
         self.col = -1
-        self.moved = False
+        self.init_grid = (-1, -1)
+
+    @property
+    def moved(self):
+        return (self.row, self.col) != self.init_grid
 
     def move(self, row=None, col=None):
         # 设置棋子的位置
@@ -76,26 +80,15 @@ class Chessman(pygame.sprite.Sprite):
                 # 兵
                 if mode:
                     if self.up() is None:
-                        res.append((self.col, self.row - 1))
-                        if self.row == 6 and self.up(2) is None:
-                            res.append((self.col, self.row - 2))
-                    if self.left() and self.left().up() and self.left().color == 'b':
-                        res.append((self.col - 1, self.row - 1))
-                    if self.right() and self.right().up() and self.right().color == 'b':
-                        res.append(self.col - 1, self.row - 1)
+                        res.append((self.row - 1, self.col))
+                        if (not self.moved) and self.up(2) is None:
+                            res.append((self.row - 2, self.col))
                 else:
                     if self.down() is None:
-                        res.append((self.col, self.row + 1))
-                        if self.row == 1 and self.down(2) is None:
-                            res.append((self.col, self.row + 2))
-                    if self.left() and self.left().down() and self.left().color == 'b':
-                        res.append((self.col - 1, self.row + 1))
-                    if self.right() and self.right().down() and self.right().color == 'b':
-                        res.append((self.col + 1, self. row + 1))
+                        res.append((self.row, self.col + 1))
+                        if (not self.moved) and self.down(2) is None:
+                            res.append((self.row + 2, self.col))
         return res
-
-# mode: True白棋在下面 / False黑棋在下面
-mode = True
 
 def place_chess():
     # 生成棋子 Chessman 对象
@@ -199,6 +192,7 @@ def place_chess():
                     chessman.move(row=6)
                 chessman.move(col=bp)
                 bp += 1
+        chessman.init_grid = (chessman.row, chessman.col)
         chessboard[chessman.row][chessman.col] = chessman
 
 def print_chessboard():
@@ -217,6 +211,8 @@ bg = pygame.image.load('images/bg.png')
 pygame.display.set_caption('二向箔 Chess')
 pygame.display.set_icon(bg)
 chessboard = []
+# mode: True白棋在下面 / False黑棋在下面
+mode = True
 place_chess()
 
 chosen = None
@@ -243,12 +239,14 @@ while running:
                 chosen = None
         elif event.type == pygame.MOUSEBUTTONUP:
             down = False
-            row, col = pos_to_grid(event.pos)
-            print(chosen.get_moves(), (row, col))
-            if chosen and (row, col) in chosen.get_moves():
-                chosen.rect.topleft = (col * GRID, row * GRID)
-            else:
-                chosen.move()
+            if chosen:
+                row, col = pos_to_grid(event.pos)
+                print(chosen, chosen.get_moves(), row, col)
+                if (row, col) in chosen.get_moves():
+                    chosen.move(row=row, col=col)
+                    chosen = None
+                else:
+                    chosen.move()
         elif event.type == pygame.MOUSEMOTION:
             if chosen and down:
                 chosen.rect.center = event.pos
@@ -258,7 +256,7 @@ while running:
                 if chessman is chosen:
                     screen.blit(chessman.back, chessman.rect)
                     for pos in chessman.get_moves():
-                        screen.blit(chessman.back, (pos[0] * GRID, pos[1] * GRID))
+                        screen.blit(chessman.back, (pos[1] * GRID, pos[0] * GRID))
                 screen.blit(chessman.image, chessman.rect)
     pygame.display.flip()
 pygame.quit()
