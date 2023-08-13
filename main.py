@@ -3,8 +3,20 @@ from chess import *
 from stockfish import Stockfish
 pygame.init()
 
-fish = Stockfish("stockfish-windows-x86-64-avx2.exe")
-fish.set_depth(10)
+def square_to_pos(square):
+    row, col = square
+    x = 30 + col * 50
+    y = 30 + row * 50
+    return (x, y)
+
+def pos_to_square(pos):
+    x, y = pos
+    row = (y - 30) // 50
+    col = (x - 30) // 50
+    return (row, col)
+
+engine = Stockfish("stockfish-windows-x86-64-avx2.exe")
+engine.set_depth(10)
 board = Board()
 
 screen = pygame.display.set_mode((460, 460))
@@ -24,7 +36,7 @@ images = {
     (BLACK, BISHOP): pygame.image.load('images/bb.png'),
     (BLACK, PAWN)  : pygame.image.load('images/bp.png'),
 }
-pygame.display.set_caption("二向箔 Chess")
+pygame.display.set_caption('二向箔 Chess')
 pygame.display.set_icon(images[(BLACK, PAWN)])
 
 back = pygame.Surface((50, 50)).convert_alpha()
@@ -39,21 +51,25 @@ while running:
     screen.fill((0, 0, 0))
     screen.blit(bg, (30, 30))
     if chosen:
-        screen.blit(back, (30 + chosen[0] * 50, 30 + chosen[1] * 50))
-    for row in range(8):
-        for col in range(8):
-            piece = board.piece_at(square(row, col))
+        screen.blit(back, square_to_pos(chosen))
+        moves = list(map(str, board.legal_moves))
+        for move in moves:
+            if move[:2] == 'abcdefgh'[chosen[1]] + '87654321'[chosen[0]]:
+                screen.blit(back, square_to_pos(('87654321'.index(move[3]), ('abcdefgh'.index(move[2])))))
+    for col in range(8):
+        for row in range(8):
+            piece = board.piece_at(square(col, row))
             if piece:
                 color = not piece.color
                 piece_type = piece.piece_type
                 image = images[(color, piece_type)]
-                screen.blit(image, (30 + row * 50, 30 + col * 50))
+                screen.blit(image, square_to_pos((row, col)))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            row, col = (event.pos[0] - 30) // 50, (event.pos[1] - 30) // 50
-            if 0 <= row < 8 and 0 <= col < 8 and board.piece_at(square(row, col)):
+            row, col = pos_to_square(event.pos)
+            if 0 <= row < 8 and 0 <= col < 8 and board.piece_at(square(col, row)):
                 chosen = (row, col)
             else:
                 chosen = None
