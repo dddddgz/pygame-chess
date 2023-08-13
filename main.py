@@ -11,18 +11,18 @@ screen = pygame.display.set_mode((460, 460))
 bg = pygame.image.load('images/bg.png')
 
 images = {
-    (BLACK, KING)  : pygame.image.load('images/bk.png'),
-    (BLACK, QUEEN) : pygame.image.load('images/bq.png'),
-    (BLACK, ROOK)  : pygame.image.load('images/br.png'),
-    (BLACK, KNIGHT): pygame.image.load('images/bn.png'),
-    (BLACK, BISHOP): pygame.image.load('images/bb.png'),
-    (BLACK, PAWN)  : pygame.image.load('images/bp.png'),
     (WHITE, KING)  : pygame.image.load('images/wk.png'),
     (WHITE, QUEEN) : pygame.image.load('images/wq.png'),
     (WHITE, ROOK)  : pygame.image.load('images/wr.png'),
     (WHITE, KNIGHT): pygame.image.load('images/wn.png'),
     (WHITE, BISHOP): pygame.image.load('images/wb.png'),
     (WHITE, PAWN)  : pygame.image.load('images/wp.png'),
+    (BLACK, KING)  : pygame.image.load('images/bk.png'),
+    (BLACK, QUEEN) : pygame.image.load('images/bq.png'),
+    (BLACK, ROOK)  : pygame.image.load('images/br.png'),
+    (BLACK, KNIGHT): pygame.image.load('images/bn.png'),
+    (BLACK, BISHOP): pygame.image.load('images/bb.png'),
+    (BLACK, PAWN)  : pygame.image.load('images/bp.png'),
 }
 pygame.display.set_caption("二向箔 Chess")
 pygame.display.set_icon(images[(BLACK, PAWN)])
@@ -35,12 +35,13 @@ clock = pygame.time.Clock()
 running = True
 while running:
     clock.tick(30)
-    screen.blit(bg, (0, 0))
+    screen.fill((0, 0, 0))
+    screen.blit(bg, (30, 30))
     for row in range(8):
         for col in range(8):
             piece = board.piece_at(square(row, col))
             if piece:
-                color = piece.color
+                color = not piece.color
                 piece_type = piece.piece_type
                 image = images[(color, piece_type)]
                 screen.blit(image, (30 + row * 50, 30 + col * 50))
