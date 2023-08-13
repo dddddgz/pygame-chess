@@ -29,14 +29,17 @@ pygame.display.set_icon(images[(BLACK, PAWN)])
 
 back = pygame.Surface((50, 50)).convert_alpha()
 back.fill((0, 0, 0, 0))
-pygame.draw.circle(back, 'BurlyWood', (20, 20), 20)
+pygame.draw.circle(back, 'BurlyWood', (25, 25), 25)
 
 clock = pygame.time.Clock()
+chosen = None
 running = True
 while running:
-    clock.tick(30)
+    clock.tick(50)
     screen.fill((0, 0, 0))
     screen.blit(bg, (30, 30))
+    if chosen:
+        screen.blit(back, (30 + chosen[0] * 50, 30 + chosen[1] * 50))
     for row in range(8):
         for col in range(8):
             piece = board.piece_at(square(row, col))
@@ -48,5 +51,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            row, col = (event.pos[0] - 30) // 50, (event.pos[1] - 30) // 50
+            if 0 <= row < 8 and 0 <= col < 8 and board.piece_at(square(row, col)):
+                chosen = (row, col)
+            else:
+                chosen = None
     pygame.display.flip()
 pygame.quit()
