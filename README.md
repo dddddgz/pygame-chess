@@ -10,6 +10,12 @@
     <td>状态</td>
   </tr>
   <tr>
+    <td>额外减小</td>
+    <td>提出使用 Stockfish 内核解决 AI 移动问题</td>
+    <td><a href="https://fishc.com.cn/forum.php?mod=redirect&goto=findpost&ptid=232330&pid=6320092">传送门</a></td>
+    <td>✔已采纳</td>
+  </tr>
+  <tr>
     <td rowspan=2>鱼cpython学习者</td>
     <td>修复 bug</td>
     <td><a href="https://fishc.com.cn/forum.php?mod=redirect&goto=findpost&ptid=232245&pid=6318924">传送门</a></td>
